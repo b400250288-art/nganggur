@@ -297,8 +297,8 @@ export default function StudentGradesPage() {
         )}
       </div>
 
-      {/* Grades Table */}
-      <Card className="card-glow overflow-hidden">
+      {/* Grades Table - Hidden on Mobile */}
+      <Card className="hidden md:block card-glow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -380,6 +380,89 @@ export default function StudentGradesPage() {
           </table>
         </div>
       </Card>
+
+      {/* Grades Cards - Shown on Mobile */}
+      <div className="block md:hidden space-y-3">
+        {filteredGrades.length === 0 ? (
+          <Card className="card-glow py-12 text-center text-muted-foreground">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <BookOpen className="h-10 w-10 mb-3 opacity-30 text-teal-600" />
+              <p className="font-medium">
+                {searchQuery ? "Tidak ditemukan" : "Belum ada nilai yang diinput"}
+              </p>
+              <p className="text-xs mt-1">
+                {!searchQuery && "Klik 'Tambah Nilai' untuk mulai input nilai mata kuliah"}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <AnimatePresence>
+            {filteredGrades.map((grade: any, i: number) => (
+              <motion.div
+                key={grade.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ delay: i * 0.03 }}
+              >
+                <Card className="card-glow relative overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1">
+                        <p className="font-bold text-sm text-foreground line-clamp-2 leading-snug">{grade.course.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {grade.course.code} &bull; Smt {grade.semester}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Tahun Akademik: {grade.academicYear}
+                        </p>
+                      </div>
+                      <div className="text-right space-y-1.5 shrink-0">
+                        <p className="text-lg font-extrabold text-foreground leading-none">{Number(grade.numericGrade).toFixed(0)}</p>
+                        <span
+                          className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${getLetterGradeColor(grade.letterGrade)}`}
+                        >
+                          {grade.letterGrade}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-border mt-3 pt-2">
+                      {grade.notes ? (
+                        <p className="text-[10px] text-muted-foreground italic truncate max-w-[50%]">
+                          "{grade.notes}"
+                        </p>
+                      ) : (
+                        <div />
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2.5 text-xs gap-1"
+                          onClick={() => openEditDialog(grade)}
+                        >
+                          <Pencil className="h-3 w-3" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2.5 text-xs text-destructive hover:bg-destructive/10 gap-1"
+                          onClick={() => setDeleteId(grade.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          Hapus
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
+      </div>
 
       {/* Add/Edit Dialog */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>

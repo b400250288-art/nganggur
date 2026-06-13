@@ -19,13 +19,27 @@ import {
   ChevronLeft,
   Eye,
   EyeOff,
+  Search,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema, type RegisterInput } from "@/validators";
 import {
@@ -49,8 +63,13 @@ export default function RegisterPage() {
   const [careerTargets, setCareerTargets] = useState<SelectOption[]>([]);
 
   // Loading states for dynamic dropdowns
+  const [loadingUniversities, setLoadingUniversities] = useState(true);
   const [loadingProdi, setLoadingProdi] = useState(false);
   const [loadingCareer, setLoadingCareer] = useState(false);
+
+  // University combobox state
+  const [univOpen, setUnivOpen] = useState(false);
+  const [univSearch, setUnivSearch] = useState("");
 
   const {
     register,
@@ -76,11 +95,21 @@ export default function RegisterPage() {
   const selectedUniversity = watch("universityId");
   const selectedProdi = watch("studyProgramId");
 
+  const selectedUniversityLabel = universities.find(
+    (u) => u.value === selectedUniversity
+  )?.label;
+
+  const filteredUniversities = universities.filter((u) =>
+    u.label.toLowerCase().includes(univSearch.toLowerCase())
+  );
+
   // Fetch universities on mount
   useEffect(() => {
     async function loadUniversities() {
+      setLoadingUniversities(true);
       const options = await getUniversityOptions();
       setUniversities(options);
+      setLoadingUniversities(false);
     }
     loadUniversities();
   }, []);
@@ -337,26 +366,81 @@ export default function RegisterPage() {
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
+              {/* University — Searchable Combobox */}
               <div className="space-y-2">
                 <Label htmlFor="universityId">Universitas</Label>
-                <div className="relative flex items-center">
-                  <GraduationCap className="absolute left-3 h-4 w-4 text-muted-foreground z-10" />
-                  <Select
-                    onValueChange={(val) => setValue("universityId", val)}
-                    defaultValue={watch("universityId")}
-                  >
-                    <SelectTrigger className="pl-10 bg-background text-left">
-                      <SelectValue placeholder="Pilih Universitas Anda" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {universities.map((u) => (
-                        <SelectItem key={u.value} value={u.value}>
-                          {u.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Popover open={univOpen} onOpenChange={setUnivOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      id="universityId"
+                      type="button"
+                      role="combobox"
+                      aria-expanded={univOpen}
+                      className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                        !selectedUniversityLabel ? "text-muted-foreground" : "text-foreground"
+                      }`}
+                      disabled={loadingUniversities}
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <GraduationCap className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        {loadingUniversities
+                          ? "Memuat universitas..."
+                          : selectedUniversityLabel || "Cari dan pilih universitas Anda..."}
+                      </span>
+                      {loadingUniversities ? (
+                        <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />
+                      ) : (
+                        <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                    {/* Search input */}
+                    <div className="flex items-center gap-2 border-b px-3 py-2">
+                      <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <input
+                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                        placeholder="Ketik nama universitas..."
+                        value={univSearch}
+                        onChange={(e) => setUnivSearch(e.target.value)}
+                        autoFocus
+                      />
+                    </div>
+                    {/* Results list */}
+                    <div className="max-h-64 overflow-y-auto">
+                      {filteredUniversities.length === 0 ? (
+                        <p className="py-6 text-center text-sm text-muted-foreground">
+                          Universitas tidak ditemukan.
+                        </p>
+                      ) : (
+                        filteredUniversities.map((u) => (
+                          <button
+                            key={u.value}
+                            type="button"
+                            className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground text-left"
+                            onClick={() => {
+                              setValue("universityId", u.value);
+                              setUnivSearch("");
+                              setUnivOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={`h-4 w-4 shrink-0 ${
+                                selectedUniversity === u.value
+                                  ? "text-teal-600 opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            {u.label}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                    <p className="border-t px-3 py-1.5 text-xs text-muted-foreground">
+                      {filteredUniversities.length} universitas tersedia
+                    </p>
+                  </PopoverContent>
+                </Popover>
                 {errors.universityId && (
                   <p className="text-xs font-medium text-destructive mt-1">
                     {errors.universityId.message}
@@ -364,6 +448,7 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Study Program */}
               <div className="space-y-2">
                 <Label htmlFor="studyProgramId">Program Studi (Prodi)</Label>
                 <div className="relative flex items-center">
@@ -399,6 +484,7 @@ export default function RegisterPage() {
                 )}
               </div>
 
+              {/* Semester */}
               <div className="space-y-2">
                 <Label htmlFor="semester">Semester Saat Ini</Label>
                 <div className="relative flex items-center">

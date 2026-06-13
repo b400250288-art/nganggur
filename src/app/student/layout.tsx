@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { logoutAction } from "@/features/auth/actions";
 import { Button } from "@/components/ui/button";
+import MobileNav from "./MobileNav";
 
 export default async function StudentLayout({
   children,
@@ -141,9 +142,9 @@ export default async function StudentLayout({
       {/* Main container */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 text-card-foreground">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-muted-foreground bg-slate-100 dark:bg-slate-900 border border-border px-3 py-1 rounded-full">
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 md:px-6 text-card-foreground">
+          <div className="flex items-center gap-2 max-w-[60%] sm:max-w-none overflow-hidden">
+            <span className="text-xs font-semibold text-muted-foreground bg-slate-100 dark:bg-slate-900 border border-border px-3 py-1 rounded-full truncate">
               Target Karir: <span className="text-primary font-bold">{targetCareerName}</span>
             </span>
           </div>
@@ -163,12 +164,15 @@ export default async function StudentLayout({
         </header>
 
         {/* Page content scrollable */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
           <div className="mx-auto max-w-5xl space-y-6">
             {children}
           </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileNav />
     </div>
   );
 }

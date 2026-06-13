@@ -123,15 +123,14 @@ export async function registerAction(input: RegisterInput): Promise<ApiResponse>
     const validated = registerSchema.parse(input);
     const supabase = await createClient();
 
-    // 1. Sign up user via Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // 1. Sign up user via Supabase Auth using Admin API (bypasses email confirmation SMTP rate limit)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: validated.email,
       password: validated.password,
-      options: {
-        data: {
-          role: "student",
-          full_name: validated.fullName,
-        },
+      email_confirm: true,
+      user_metadata: {
+        role: "student",
+        full_name: validated.fullName,
       },
     });
 
@@ -336,7 +335,7 @@ export async function getStudyProgramOptions(universityId: string): Promise<Sele
 
     return programs.map((p) => ({
       value: p.id,
-      label: `${p.degree} ${p.name}`,
+      label: p.name,
     }));
   } catch (error) {
     console.error("Error fetching study programs:", error);

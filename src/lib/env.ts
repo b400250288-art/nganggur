@@ -22,7 +22,7 @@ const envSchema = z.object({
   RESEND_FROM_EMAIL: z.string().email().default("noreply@industrymirror.id"),
 
   // Sentry
-  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().or(z.literal("")).optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),

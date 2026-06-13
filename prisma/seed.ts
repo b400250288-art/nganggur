@@ -89,7 +89,7 @@ async function main() {
       name: "S1 Manajemen",
       code: "MNG-UID",
       degree: "S1",
-      accreditation: "Unggul",
+      accreditation: "A",
     },
   });
 
