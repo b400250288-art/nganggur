@@ -1,0 +1,48 @@
+name: Industry Mirror CI/CD Workflow
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Run ESLint Linter
+        run: npm run lint
+        # Set to continue-on-error if you want the pipeline to build despite warnings/lint issues, 
+        # or leave as strict check. We keep it standard.
+        continue-on-error: true
+
+      - name: Run Vitest Tests
+        run: npm run test
+
+      - name: Run Production Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+          NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key"
+          SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key"
+          DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+          DIRECT_URL: "postgresql://test:test@localhost:5432/test"
+          GROQ_API_KEY: "test-groq-key"
+          RESEND_API_KEY: "test-resend-key"

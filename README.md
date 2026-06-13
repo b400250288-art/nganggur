@@ -1,40 +1,112 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Industry Mirror
 
-## Getting Started
+> **"Career Intelligence Platform for Economics Students"**
 
-First, run the development server:
+Industry Mirror is a production-ready Career Intelligence Platform designed specifically for Economics students in Indonesia. Built as a B2B2C SaaS platform, it connects academic achievements (grades) with real-world industry career targets using a custom-weighted Career Fit Engine and Groq AI recommendation service (Llama-3.3-70b-versatile).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## 🚀 Key Features
+
+1. **Student Career Readiness Engine**: Map course grades against target career profiles (e.g., Auditor, Financial Analyst, Brand Manager) using a customized weights matrix.
+2. **Groq AI-powered Roadmap & gap Analysis**: Generates personalized learning paths, courses, and certifications based on the student's academic weaknesses.
+3. **Automated Job Search Queries**: Direct linkages to LinkedIn, JobStreet, and Glints for targeted career roles.
+4. **University & Faculty Analytics Dashboard**: Aggregated dashboards showing student performance distribution, career choices, and systemic course weaknesses.
+5. **AI Curriculum Improvement Report**: Automated curriculum evaluation based on aggregate student cohorts to improve course offerings.
+6. **Robust RBAC (Role-Based Access Control)**: Restricts features for Student, University Admins, and Super Admins.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js 15 (App Router), TypeScript, TailwindCSS, Shadcn UI, Framer Motion, Lucide React, Zustand, React Hook Form, Zod.
+- **Backend & Database**: Next.js Server Actions & Route Handlers, Supabase PostgreSQL, Prisma ORM.
+- **Authentication**: Supabase Auth (integrated with custom RBAC middleware).
+- **AI Integrations**: Groq SDK (`llama-3.3-70b-versatile` & `llama-3.1-8b-instant`).
+- **Analytics**: Recharts.
+- **Monitoring & Email**: Sentry, Resend.
+- **Testing**: Vitest, React Testing Library.
+
+---
+
+## 📁 Folder Structure
+
+The application layout is structured as follows:
+
+```text
+src/
+├── app/                  # Next.js pages, layouts, and route handlers
+├── components/           # Reusable UI elements (Shadcn) & providers
+├── features/             # Business modules (admin, auth, landing, student, university)
+│   ├── [module]/
+│   │   ├── components/   # Feature-specific components
+│   │   └── actions.ts    # Server Actions for DB queries and mutators
+├── hooks/                # Custom React hooks (e.g., use-toast)
+├── lib/                  # Shared configurations (Supabase, Prisma, env parser)
+├── services/             # Core engines (Groq AI, Career Fit, Job Search)
+├── stores/               # Client-side stores (Zustand)
+├── tests/                # Vitest unit and integration tests
+├── types/                # TypeScript type definitions
+└── validators/           # Zod schema validation rules
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ⚙️ Local Setup Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Prerequisites
+- **Node.js**: v20 or later
+- **npm**: v10 or later
+- **Supabase**: A free Supabase project for Auth, PostgreSQL, and Database storage.
+- **Groq API Key**: A valid Groq Cloud API Key.
 
-## Learn More
+### 2. Environment Setup
+Clone this repository and create a `.env` file (copied from `.env.example`):
+```bash
+cp .env.example .env
+```
+Fill in the variables including `DATABASE_URL` (direct/pooler), `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `GROQ_API_KEY`.
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Install Dependencies
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Database Setup & Seeding
+Push the schema to your Supabase PostgreSQL instance and seed the database with demo admin, university, and student records:
+```bash
+# Generate Prisma Client
+npm run db:generate
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Push migrations/schemas to database
+npm run db:push
 
-## Deploy on Vercel
+# Seed default mock data
+npm run db:seed
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 5. Running the Application
+Start the development server:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# nganggur
->>>>>>> df91cc9ea23ff1ec68b78383c0d3342da2883c09
+---
+
+## 🧪 Testing and Linting
+
+- **Run Tests**: `npm run test`
+- **Lint Code**: `npm run lint`
+- **Format Code**: `npm run format`
+
+---
+
+## 📖 Additional Documentation
+
+For detailed information on design, database schemas, and compliance:
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture and tech patterns.
+- [DATABASE.md](./DATABASE.md) - ERD representation and supabase policies.
+- [API.md](./API.md) - Server actions and route API structure.
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Vercel & Supabase deployment guides.
+- [SECURITY.md](./SECURITY.md) - Access controls, RLS, and data safety.
